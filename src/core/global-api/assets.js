@@ -20,12 +20,15 @@ export function initAssetRegisters (Vue: GlobalAPI) {
           validateComponentName(id)
         }
         if (type === 'component' && isPlainObject(definition)) {
+          // 组件名称
           definition.name = definition.name || id
+          // 创建构造函数Vue.component('comp', {...})
           definition = this.options._base.extend(definition)
         }
         if (type === 'directive' && typeof definition === 'function') {
           definition = { bind: definition, update: definition }
         }
+        // 注册到全局配置上 components,未来再和组件内部局部组件合并
         this.options[type + 's'][id] = definition
         return definition
       }
