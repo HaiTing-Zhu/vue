@@ -40,18 +40,24 @@ export class Observer {
   vmCount: number; // number of vms that have this object as root $data
 
   constructor (value: any) {
+    // 保存传入的对象
     this.value = value
+    // 创建Dep实例，data:{foo: {}} 和对象的key一对一对应的关系
+    // 大管家：对象动态的删除，增加属性，负责通知更新
     this.dep = new Dep()
     this.vmCount = 0
     def(value, '__ob__', this)
+    // 判断value类型，做对应处理
     if (Array.isArray(value)) {
       if (hasProto) {
+        // 如果当前数组有原型
         protoAugment(value, arrayMethods)
       } else {
         copyAugment(value, arrayMethods, arrayKeys)
       }
       this.observeArray(value)
     } else {
+      // 对象
       this.walk(value)
     }
   }
@@ -86,6 +92,7 @@ export class Observer {
  */
 function protoAugment (target, src: Object) {
   /* eslint-disable no-proto */
+  // 覆盖原型
   target.__proto__ = src
   /* eslint-enable no-proto */
 }
@@ -108,9 +115,11 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * or the existing observer if the value already has one.
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
+  // 不是对象直接return
   if (!isObject(value) || value instanceof VNode) {
     return
   }
+  // 避免重复处理：如果存在__ob__说明做过数据响应式处理
   let ob: Observer | void
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
     ob = value.__ob__
@@ -139,6 +148,7 @@ export function defineReactive (
   customSetter?: ?Function,
   shallow?: boolean
 ) {
+  // 小管家：和key一对一对应，负责对象的值如果发生变化，负责通知更新
   const dep = new Dep()
 
   const property = Object.getOwnPropertyDescriptor(obj, key)
@@ -153,14 +163,17 @@ export function defineReactive (
     val = obj[key]
   }
 
+  // 做递归处理，如果value是对象得到observe实例
   let childOb = !shallow && observe(val)
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
+      // 依赖收集
       if (Dep.target) {
         dep.depend()
+        // 如果存在子Ob，大管家也要和当前的watcher建立关系
         if (childOb) {
           childOb.dep.depend()
           if (Array.isArray(value)) {
@@ -188,6 +201,7 @@ export function defineReactive (
         val = newVal
       }
       childOb = !shallow && observe(newVal)
+      // 通知更新
       dep.notify()
     }
   })

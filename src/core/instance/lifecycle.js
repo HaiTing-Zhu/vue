@@ -29,6 +29,7 @@ export function setActiveInstance(vm: Component) {
   }
 }
 
+// 生命周期初始化
 export function initLifecycle (vm: Component) {
   const options = vm.$options
 
@@ -40,11 +41,12 @@ export function initLifecycle (vm: Component) {
     }
     parent.$children.push(vm)
   }
-
+  // 父级，祖代
   vm.$parent = parent
   vm.$root = parent ? parent.$root : vm
-
+  // 孩子
   vm.$children = []
+  // 后代
   vm.$refs = {}
 
   vm._watcher = null

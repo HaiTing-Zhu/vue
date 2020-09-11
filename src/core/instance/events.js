@@ -13,6 +13,9 @@ export function initEvents (vm: Component) {
   vm._events = Object.create(null)
   vm._hasHookEvent = false
   // init parent attached events
+  // 拿到选项，处理父级监听器并处理
+  // <Child @some-event="onXXX">
+  // Child.$emit('xxx') Child.$on('onXXX')
   const listeners = vm.$options._parentListeners
   if (listeners) {
     updateComponentListeners(vm, listeners)

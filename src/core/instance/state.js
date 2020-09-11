@@ -48,8 +48,11 @@ export function proxy (target: Object, sourceKey: string, key: string) {
 export function initState (vm: Component) {
   vm._watchers = []
   const opts = vm.$options
+  // 1、先做属性的响应式
   if (opts.props) initProps(vm, opts.props)
+  // 2、再做方法的响应式
   if (opts.methods) initMethods(vm, opts.methods)
+  // 3、最后做数据的响应式
   if (opts.data) {
     initData(vm)
   } else {
@@ -111,6 +114,7 @@ function initProps (vm: Component, propsOptions: Object) {
 
 function initData (vm: Component) {
   let data = vm.$options.data
+  // 判断选项类型
   data = vm._data = typeof data === 'function'
     ? getData(data, vm)
     : data || {}
@@ -124,6 +128,7 @@ function initData (vm: Component) {
   }
   // proxy data on instance
   const keys = Object.keys(data)
+  // 校验data是否和props和methods的是否冲突
   const props = vm.$options.props
   const methods = vm.$options.methods
   let i = keys.length
@@ -148,6 +153,7 @@ function initData (vm: Component) {
     }
   }
   // observe data
+  // 数据响应式
   observe(data, true /* asRootData */)
 }
 
@@ -336,12 +342,15 @@ export function stateMixin (Vue: Class<Component>) {
       warn(`$props is readonly.`, this)
     }
   }
+  // 定义两个属性
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 
+  // 挂载两个实例方法
   Vue.prototype.$set = set
   Vue.prototype.$delete = del
 
+  // 侦听器
   Vue.prototype.$watch = function (
     expOrFn: string | Function,
     cb: any,
