@@ -130,6 +130,7 @@ export function createComponent (
   }
 
   // async component
+  // 异步组件
   let asyncFactory
   if (isUndef(Ctor.cid)) {
     asyncFactory = Ctor
@@ -148,6 +149,8 @@ export function createComponent (
     }
   }
 
+  // <comp>XXX</comp>
+  // 预处理自定义组件属性
   data = data || {}
 
   // resolve constructor options in case global mixins are applied after
@@ -155,6 +158,7 @@ export function createComponent (
   resolveConstructorOptions(Ctor)
 
   // transform component v-model data into props & events
+  // 双向绑定预处理
   if (isDef(data.model)) {
     transformModel(Ctor.options, data)
   }
